@@ -1,54 +1,64 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "./components/ThemeProvider";
+import Loader from "./components/Loader";
+import Header from "./components/Header";
+import Hero from "./components/Hero";
+import Services from "./components/Services";
+import Gallery from "./components/Gallery";
+import Testimonials from "./components/Testimonials";
+import Booking from "./components/Booking";
+import Contact from "./components/Contact";
+import Footer from "./components/Footer";
+import WhatsAppButton from "./components/WhatsAppButton";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+function Site() {
+  const [data, setData] = useState({ services: [], stylists: [], gallery: [], testimonials: [] });
 
   useEffect(() => {
-    helloWorldApi();
+    const load = async () => {
+      try {
+        const [s, st, g, t] = await Promise.all([
+          axios.get(`${API}/services`),
+          axios.get(`${API}/stylists`),
+          axios.get(`${API}/gallery`),
+          axios.get(`${API}/testimonials`),
+        ]);
+        setData({ services: s.data, stylists: st.data, gallery: g.data, testimonials: t.data });
+      } catch (e) {
+        console.error("Error loading data", e);
+      }
+    };
+    load();
   }, []);
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
-
-function App() {
-  return (
     <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <Loader />
+      <Header />
+      <main>
+        <Hero />
+        <Services services={data.services} />
+        <Gallery items={data.gallery} />
+        <Testimonials items={data.testimonials} />
+        <Booking services={data.services} stylists={data.stylists} />
+        <Contact />
+      </main>
+      <Footer />
+      <WhatsAppButton />
+      <Toaster position="bottom-center" theme="dark" />
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <ThemeProvider>
+      <Site />
+    </ThemeProvider>
+  );
+}
