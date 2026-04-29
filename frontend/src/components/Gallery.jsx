@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Dialog, DialogContent } from "./ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "./ui/dialog";
 import { X } from "lucide-react";
 
 export default function Gallery({ items }) {
@@ -62,6 +62,8 @@ export default function Gallery({ items }) {
         >
           {active && (
             <div className="relative">
+              <DialogTitle className="sr-only">{active.title}</DialogTitle>
+              <DialogDescription className="sr-only">{active.category} — {active.title}</DialogDescription>
               <img src={active.url} alt={active.title} className="w-full max-h-[85vh] object-contain bg-black" />
               <button
                 data-testid="gallery-close"

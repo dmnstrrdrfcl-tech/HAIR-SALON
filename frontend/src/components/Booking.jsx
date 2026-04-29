@@ -26,7 +26,9 @@ export default function Booking({ services, stylists }) {
 
   const service = services.find((s) => s.id === serviceId);
   const stylist = stylists.find((s) => s.id === stylistId);
-  const dateStr = date ? date.toISOString().slice(0, 10) : null;
+  const dateStr = date
+    ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+    : null;
 
   useEffect(() => {
     const fetchSlots = async () => {
